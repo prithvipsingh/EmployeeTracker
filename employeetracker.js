@@ -1,7 +1,7 @@
 // seting up pakages which are need to run app
 const mysql = require("mysql");
 const inquirer = require("inquirer");
-
+const cTable = require('console.table');
 // setting up connection with database 
 const connection = mysql.createConnection({
 
@@ -19,4 +19,3 @@ connection.connect(function(err) {
   });
 
 
-  
