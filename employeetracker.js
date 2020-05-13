@@ -7,12 +7,12 @@ const connection = mysql.createConnection({
   host: "localhost",
   port: 3306,
   user: "root",
-  passoword: "Pps1187#deora",
+  password: "Pps1187#deora",
   database: "employee_DB",
 });
 connection.connect(function (err) {
   if (err) throw err;
-  console.log("connected as id " + connection.threadId + "\n");
+  console.log("connected as id " + connection.threadId +"\n");
   start();
 });
 //creating start function which promot all options 
@@ -76,4 +76,43 @@ function start() {
       }
     });
 }
-//
+ // create function for add new employee
+ function addEmployee() {
+  console.log("Inserting a new employee.\n");
+  inquirer 
+    .prompt ([ 
+      {
+        type: "input", 
+        message: "First Name?",
+        name: "first_name",
+      },
+      {
+        type: "input", 
+        message: "Last Name?",
+        name: "last_name"
+      },
+      {
+        type: "list",
+        message: "What is the employee's role?",
+        name: "role_id", 
+        choices: [1,2,3]
+      },
+      {
+        type: "input", 
+        message: "Who is their manager?",
+        name: "manager_id"
+      }
+    ])
+    .then (function(res){
+      const query = connection.query(
+        "INSERT INTO employees SET ?", 
+       res,
+        function(err, res) {
+          if (err) throw err;
+          console.log( "Employee added!\n");
+  
+          start (); 
+        }
+      );    
+    })
+  }
