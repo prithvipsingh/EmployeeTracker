@@ -159,3 +159,36 @@ function removeEmployee() {
     }
   );
 }
+//Create function for add Department 
+function addDept(){
+  inquirer
+  .prompt([
+    {
+      type: "input",
+      name: "deptName", 
+      message: "What Department would you like to add?"
+    }
+  ])
+  .then(function(res){
+    console.log(res);
+    const query = connection.query(
+      "INSERT INTO departments SET ?", 
+      {
+        name: res.deptName
+      }, 
+      function(err, res){
+        connection.query("SELECT * FROM departments", function(err, res){
+          console.table(res); 
+          start(); 
+        })
+      }
+    )
+  })
+}
+// Adding function for view all department
+function viewAllDept(){
+  connection.query ("SELECT * FROM departments", function(err, res){
+    console.table(res);
+    start();
+  })
+  }
