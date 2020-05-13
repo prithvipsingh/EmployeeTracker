@@ -76,6 +76,27 @@ function start() {
       }
     });
 }
+//#region banner
+console.log(`,-----------------------------------------------------.
+|                                                     |
+|     _____                 _                         |
+|    | ____|_ __ ___  _ __ | | ___  _   _  ___  ___   |
+|    |  _| | '_ \` _ \\| '_ \\| |/ _ \\| | | |/ _ \\/ _ \\  |
+|    | |___| | | | | | |_) | | (_) | |_| |  __/  __/  |
+|    |_____|_| |_| |_| .__/|_|\\___/ \\__, |\\___|\\___|  |
+|                    |_|            |___/             |
+|                                                     |
+|     __  __                                          |
+|    |  \\/  | __ _ _ __   __ _  __ _  ___ _ __        |
+|    | |\\/| |/ _\` | '_ \\ / _\` |/ _\` |\/ _ \\ '__|       |
+|    | |  | | (_| | | | | (_| | (_| |  __/ |          |
+|    |_|  |_|\\__,_|_| |_|\\__,_|\\__, |\\___|_|          |
+|                              |___/                  |
+|                                                     |
+\`-----------------------------------------------------'
+`);
+//#endregion
+
 // create function for add new employee
 function addEmployee() {
   console.log("Inserting a new employee.\n");
@@ -159,36 +180,93 @@ function removeEmployee() {
     }
   );
 }
-//Create function for add Department 
-function addDept(){
+//Create function for add Department
+function addDept() {
   inquirer
-  .prompt([
-    {
-      type: "input",
-      name: "deptName", 
-      message: "What Department would you like to add?"
-    }
-  ])
-  .then(function(res){
-    console.log(res);
-    const query = connection.query(
-      "INSERT INTO departments SET ?", 
+    .prompt([
       {
-        name: res.deptName
-      }, 
-      function(err, res){
-        connection.query("SELECT * FROM departments", function(err, res){
-          console.table(res); 
-          start(); 
-        })
-      }
-    )
-  })
+        type: "input",
+        name: "deptName",
+        message: "What Department would you like to add?",
+      },
+    ])
+    .then(function (res) {
+      console.log(res);
+      const query = connection.query(
+        "INSERT INTO departments SET ?",
+        {
+          name: res.deptName,
+        },
+        function (err, res) {
+          connection.query("SELECT * FROM departments", function (err, res) {
+            console.table(res);
+            start();
+          });
+        }
+      );
+    });
 }
 // Adding function for view all department
-function viewAllDept(){
-  connection.query ("SELECT * FROM departments", function(err, res){
+function viewAllDept() {
+  connection.query("SELECT * FROM departments", function (err, res) {
     console.table(res);
     start();
-  })
-  }
+  });
+}
+//Function for add Role
+function addRole() {
+  let departments = [];
+  connection.query("SELECT * FROM departments", function (err, res) {
+    if (err) throw err;
+    for (let i = 0; i < res.length; i++) {
+      res[i].first_name + " " + res[i].last_name;
+      departments.push({ name: res[i].name, value: res[i].id });
+    }
+    inquirer
+      .prompt([
+        {
+          type: "input",
+          name: "title",
+          message: "What role would you like to add?",
+        },
+        {
+          type: "input",
+          name: "salary",
+          message: "What is the salary for the role?",
+        },
+        {
+          type: "list",
+          name: "department",
+          message: "what department?",
+          choices: departments,
+        },
+      ])
+      .then(function (res) {
+        console.log(res);
+        const query = connection.query(
+          "INSERT INTO roles SET ?",
+          {
+            title: res.title,
+            salary: res.salary,
+            department_id: res.department,
+          },
+          function (err, res) {
+            if (err) throw err;
+            //const id = res.insertId;
+            start();
+          }
+        );
+      });
+  });
+}
+// Create function for view Roles
+function viewAllRoles() {
+  connection.query(
+    "SELECT roles.*, departments.name FROM roles LEFT JOIN departments ON departments.id = roles.department_id",
+    function (err, res) {
+      if (err) throw err;
+      console.table(res);
+      start();
+    }
+  );
+}
