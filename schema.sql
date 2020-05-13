@@ -41,5 +41,5 @@ VALUES ("Jason", "Mark", 1, 2), ("Mohit", "Singh", 2, 1), ("Stacy", "Carter", 3,
 INSERT INTO roles (title, salary, department_id)
 VALUES ("Manager", 200, 1), ("Engineer", 100, 2), ("Intern", 10, 2);
 
-INSERT INTO department (name)
+INSERT INTO departments (name)
 VALUES ("Admin"), ("Engineering"), ("Education");

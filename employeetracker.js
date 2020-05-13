@@ -8,7 +8,7 @@ const connection = mysql.createConnection({
   port: 3306,
   user: "root",
   password: "Pps1187#deora",
-  database: "employee_DB",
+  database: "employees",
 });
 connection.connect(function (err) {
   if (err) throw err;
@@ -126,7 +126,7 @@ function addEmployee() {
     ])
     .then(function (res) {
       const query = connection.query(
-        "INSERT INTO employees SET ?",
+        "INSERT INTO employee SET ?",
         res,
         function (err, res) {
           if (err) throw err;
@@ -140,7 +140,7 @@ function addEmployee() {
 // Function for view all employees
 function viewAllEmployees() {
   connection.query(
-    'SELECT employees.first_name, employees.last_name, roles.title AS "role", managers.first_name AS "manager" FROM employees LEFT JOIN roles ON employees.role_id = roles.id LEFT JOIN employees managers ON employees.manager_id = managers.id GROUP BY employees.id',
+    'SELECT employee.first_name, employee.last_name, role.title AS "role", managers.first_name AS "manager" FROM employee LEFT JOIN role ON employee.role_id = role.id LEFT JOIN employee managers ON employee.manager_id = managers.id GROUP BY employee.id',
     function (err, res) {
       if (err) throw err;
       // Log all results of the SELECT statement
@@ -153,7 +153,7 @@ function viewAllEmployees() {
 function removeEmployee() {
   let employeeList = [];
   connection.query(
-    "SELECT employees.first_name, employees.last_name FROM employees",
+    "SELECT employee.first_name, employee.last_name FROM employee",
     (err, res) => {
       for (let i = 0; i < res.length; i++) {
         employeeList.push(res[i].first_name + " " + res[i].last_name);
@@ -169,7 +169,7 @@ function removeEmployee() {
         ])
         .then(function (res) {
           const query = connection.query(
-            `DELETE FROM employees WHERE concat(first_name, ' ' ,last_name) = '${res.employee}'`,
+            `DELETE FROM employee WHERE concat(first_name, ' ' ,last_name) = '${res.employee}'`,
             function (err, res) {
               if (err) throw err;
               console.log("Employee deleted!\n");
@@ -193,12 +193,12 @@ function addDept() {
     .then(function (res) {
       console.log(res);
       const query = connection.query(
-        "INSERT INTO departments SET ?",
+        "INSERT INTO department SET ?",
         {
           name: res.deptName,
         },
         function (err, res) {
-          connection.query("SELECT * FROM departments", function (err, res) {
+          connection.query("SELECT * FROM department", function (err, res) {
             console.table(res);
             start();
           });
@@ -208,7 +208,7 @@ function addDept() {
 }
 // Adding function for view all department
 function viewAllDept() {
-  connection.query("SELECT * FROM departments", function (err, res) {
+  connection.query("SELECT * FROM department", function (err, res) {
     console.table(res);
     start();
   });
@@ -216,12 +216,12 @@ function viewAllDept() {
 //Function for add Role
 function addRole() {
   let departments = [];
-  connection.query("SELECT * FROM departments", function (err, res) {
+  connection.query("SELECT * FROM department", function (err, res) {
     if (err) throw err;
     for (let i = 0; i < res.length; i++) {
-      res[i].first_name + " " + res[i].last_name;
-      departments.push({ name: res[i].name, value: res[i].id });
+      departments.push(res[i].name);
     }
+    console.log(res);
     inquirer
       .prompt([
         {
@@ -238,21 +238,22 @@ function addRole() {
           type: "list",
           name: "department",
           message: "what department?",
-          choices: departments,
-        },
+          choices: departments
+                   
+        }
       ])
-      .then(function (res) {
-        console.log(res);
+      .then(function (answers) {
+        const department = res.filter(dep => dep.name === answers.department);
         const query = connection.query(
-          "INSERT INTO roles SET ?",
+          "INSERT INTO role SET ?",
           {
-            title: res.title,
-            salary: res.salary,
-            department_id: res.department,
+            title: answers.title,
+            salary: answers.salary,
+            department_id: department[0].id,
           },
-          function (err, res) {
+          function (err, answers) {
             if (err) throw err;
-            //const id = res.insertId;
+            console.log("Department Added !")
             start();
           }
         );
@@ -262,7 +263,7 @@ function addRole() {
 // Create function for view Roles
 function viewAllRoles() {
   connection.query(
-    "SELECT roles.*, departments.name FROM roles LEFT JOIN departments ON departments.id = roles.department_id",
+    "SELECT role.*, department.name FROM role LEFT JOIN department ON department.id = role.department_id",
     function (err, res) {
       if (err) throw err;
       console.table(res);
