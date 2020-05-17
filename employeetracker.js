@@ -7,7 +7,7 @@ const connection = mysql.createConnection({
   host: "localhost",
   port: 3306,
   user: "root",
-  password: "Pps1187#deora",
+  password: "",
   database: "employees",
 });
 connection.connect(function (err) {
@@ -271,43 +271,49 @@ function viewAllRoles() {
   );
 }
 //Adding function for update employeerole
-function updateEmployeeRole(){
-  connection.query("SELECT first_name, last_name, id FROM employee",
-  
-  function(err,res){
-     connection.query("SELECT * FROM role", function(err,roleResult){
-      let employee = res.map(employee => ({name: employee.first_name + " " + employee.last_name, value: employee.id}))
+function updateEmployeeRole() {
+  connection.query(
+    "SELECT first_name, last_name, id FROM employee",
 
-      roleChoices = roleResult.map(role =>({name: role.title, value: role.id}))
-       
-      inquirer
-      .prompt([
-        {
-          type: "list",
-          name: "employeeName",
-          message: "Which employee's role would you like to update?",
-          choices: employee
-        },
-        {
-          type: "list",
-          name: "role",
-          message: "what role do you want to select ?",
-          choices: roleChoices
-        }
-      ])
-      .then (function(res){
-        connection.query(`UPDATE employee SET role_id = ${res.role} WHERE id = ${res.employeeName}`,
-        function (err, res){
-          connection.query("SELECT * employee", function (err ,res){ console.table(res);})
-          start();
-        }
-        )
-      })
-     });
-    
-  }
-  )
-  }
+    function (err, res) {
+      connection.query("SELECT * FROM role", function (err, roleResult) {
+        let employee = res.map((employee) => ({
+          name: employee.first_name + " " + employee.last_name,
+          value: employee.id,
+        }));
 
+        roleChoices = roleResult.map((role) => ({
+          name: role.title,
+          value: role.id,
+        }));
 
-
+        inquirer
+          .prompt([
+            {
+              type: "list",
+              name: "employeeName",
+              message: "Which employee's role would you like to update?",
+              choices: employee,
+            },
+            {
+              type: "list",
+              name: "role",
+              message: "what role do you want to select ?",
+              choices: roleChoices,
+            },
+          ])
+          .then(function (res) {
+            connection.query(
+              `UPDATE employee SET role_id = ${res.role} WHERE id = ${res.employeeName}`,
+              function (err, res) {
+                connection.query("SELECT * employee", function (err, res) {
+                  console.table(res);
+                });
+                start();
+              }
+            );
+          });
+      });
+    }
+  );
+}
